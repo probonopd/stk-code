@@ -1,20 +1,24 @@
+achieve, addons, back, banana, blue_plus, bomb_icon, chalenge, crown, cup_*, down, edit, gamepad, gamepad_off, ghost_plus, gift,
+gp_copy, gp_edit, gp_new, gp_remove, gpeditor, green_check, gui_lock, heart, hourglass, karts, main_about, main_help, main_network,
+main_options, main_quit, mass, mode_3strikes, mode_easter, mode_ftl,
+mode_ghost, mode_normal, mode_soccer, mode_tt, mystery_unlock, networking_icon, android/nitro, android/nitro_empty, no-package, no-package-featured,
+no_package, no_package_featured, notes, options_audio, options_input, options_language, options_players, options_ui, options_video,
+package, package-featured, package-uninstall, package-update, pause, power, race_giveup, random_kart, red_mark, remove, rename,
+restart, save, screen_other, screen32, screen43, screen53, screen54, screen169, screen1610, search, slipstream_icon, soccer_ball_blue,
+soccer_ball_normal, soccer_ball_red, soccer_player_blue, soccer_player_red, speed, story_mode_book, track_random, tutorial, up, weapons,
+android/up_down, android/pause
+    by hellcp, CC BY-SA 4.0
+
+======
+
 All icons come from Open Game Art (art by onyum.com, comissionned by Bart Kelsey)
 released under CC-BY-SA 3+
 * options_players & random_kart were tweaked by Marianne Gagnon
 
 
 Except :
-main_*.png icons, hourglass, back, back_addons, next_addons, package.png
+main_*.png icons
     released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
-
-mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from yeKcim and onyum.com,
-         modified by Totoplus62
-
-mode_easter, mode_ftl, mode_soccer, mode_normal, race_giveup: by Totoplus62, released under CC-BY-SA 3.0
-
-soccer balls released under CC-BY-SA 3.0 by Néd J. Édoire
-
-tutorial.png    by Totoplus62, released under CC-BY-SA 3.0
 
 Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
 
@@ -22,27 +26,10 @@ difficulty_*.png icons, released under Creative-Commons BY-SA 3, By Conso (Const
 
 title_font, by Marianne Gagnon (Auria), released under CC-BY-SA 3+
 
-screen*.png, by Marianne Gagnon (Auria), including elements from the public domain Tango icon set
-
-speed.png by Alayan, with elements by Totoplus62, released under CC-BY-SA 3
-
 speed*.png by Alayan, released under CC-0
 
 gauge*.png by Alayan, released under CC-0
 
 menu_story by tavariz91, released under CC-0
 
-mass.png by Auria, released under CC-0
 
-power.png by Auria, based on https://openclipart.org/detail/193925/check-engine and https://openclipart.org/detail/144799/power-icon, released under CC-0
-
-crown.png by glitch, from https://openclipart.org/detail/210257/misc-game-crown, released under public domain
-
-ghost_plus.png by Alayan, based on https://openclipart.org/detail/17847/cartoon-ghost by lemmling, released under CC-O
-
-options_language.png by Alayan, based on http://www.languageicon.org/, released under CC-BY-SA 3+
-
-====
-
-Glass Skin by Auria, under CC-BY-SA 3+
-except background, under CC-BY-SA, by 'elisee'
