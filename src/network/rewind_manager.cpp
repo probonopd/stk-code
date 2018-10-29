@@ -321,6 +321,8 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // This will go back till the first confirmed state is found before
     // the specified rewind ticks.
     int exact_rewind_ticks = m_rewind_queue.undoUntil(rewind_ticks);
+    Log::info("Rewind", "at %d to %d exact %d",
+              now_ticks, rewind_ticks, exact_rewind_ticks);
 
     // Rewind the required state(s)
     // ----------------------------

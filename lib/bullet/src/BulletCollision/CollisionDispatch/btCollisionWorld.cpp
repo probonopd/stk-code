@@ -206,21 +206,26 @@ void	btCollisionWorld::updateAabbs()
 	}
 }
 
-
+extern double xx[20];
+#include "../../../src/utils/time.hpp"
 
 void	btCollisionWorld::performDiscreteCollisionDetection()
 {
+    xx[4] = StkTime::getRealTime();
 	BT_PROFILE("performDiscreteCollisionDetection");
 
 	btDispatcherInfo& dispatchInfo = getDispatchInfo();
 
 	updateAabbs();
+    xx[4] = StkTime::getRealTime() - xx[4];
 
+    xx[5] = StkTime::getRealTime();
 	{
 		BT_PROFILE("calculateOverlappingPairs");
 		m_broadphasePairCache->calculateOverlappingPairs(m_dispatcher1);
 	}
-
+    xx[5] = StkTime::getRealTime() - xx[5];
+    xx[6] = StkTime::getRealTime();
 
 	btDispatcher* dispatcher = getDispatcher();
 	{
@@ -228,7 +233,7 @@ void	btCollisionWorld::performDiscreteCollisionDetection()
 		if (dispatcher)
 			dispatcher->dispatchAllCollisionPairs(m_broadphasePairCache->getOverlappingPairCache(),dispatchInfo,m_dispatcher1);
 	}
-
+    xx[6] = StkTime::getRealTime() - xx[6];
 }
 
 

@@ -161,8 +161,8 @@ float MainLoop::getLimitedDt()
         if(!NetworkConfig::get()->isNetworking())
         {
             /* time 3 internal substeps take */
-            const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
-            if (dt > MAX_ELAPSED_TIME) dt = MAX_ELAPSED_TIME;
+       //     const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
+       //     if (dt > MAX_ELAPSED_TIME) dt = MAX_ELAPSED_TIME;
         }
         if (!m_throttle_fps || ProfileWorld::isProfileMode()) break;
 
@@ -299,6 +299,11 @@ void MainLoop::run()
 
     while (!m_abort)
     {
+        if (World::getWorld())
+            Log::info("mainloop6", "At %d %f",
+                      World::getWorld()->getTicksSinceStart(),
+                      StkTime::getRealTime());
+
 #ifdef WIN32
         if (parent != 0 && parent != INVALID_HANDLE_VALUE)
         {
@@ -318,6 +323,12 @@ void MainLoop::run()
                 m_request_abort = true;
             }
         }
+        if (World::getWorld())
+            Log::info("mainloop-99", "At %d %f",
+                      World::getWorld()->getTicksSinceStart(),
+                      StkTime::getRealTime());
+                      
+
 #else
         // POSIX equivalent
         if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
@@ -327,11 +338,21 @@ void MainLoop::run()
 #endif
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
-        left_over_time += getLimitedDt();
+        float lim_dt = getLimitedDt();
+        if (World::getWorld())
+            Log::info("mainloop-98", "At %d %f",
+                      World::getWorld()->getTicksSinceStart(),
+                      StkTime::getRealTime());
+
+        left_over_time += lim_dt;
         int num_steps   = stk_config->time2Ticks(left_over_time);
         float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
-
+        if(World::getWorld())
+            Log::info("mainloop", "At %d %f ns %d lot %f limdt %f",
+                      World::getWorld()->getTicksSinceStart(),
+                      StkTime::getRealTime(),
+                      num_steps, left_over_time, lim_dt);
         // Shutdown next frame if shutdown request is sent while loading the
         // world
         if ((STKHost::existHost() && STKHost::get()->requestedShutdown()) ||
@@ -395,6 +416,12 @@ void MainLoop::run()
                 m_abort = true;
             }
         }
+        if (World::getWorld())
+            Log::info("mainloop-97", "At %d %f ns %d lot %f limdt %f",
+                      World::getWorld()->getTicksSinceStart(),
+                      StkTime::getRealTime(),
+                      num_steps, left_over_time, lim_dt);
+
 
         if (!m_abort)
         {
@@ -420,10 +447,20 @@ void MainLoop::run()
                 PROFILER_POP_CPU_MARKER();
             }
             // Some protocols in network will use RequestManager
+            if (World::getWorld())
+                Log::info("mainloop-95", "At %d %f ns %d lot %f limdt %f",
+                          World::getWorld()->getTicksSinceStart(),
+                          StkTime::getRealTime(),
+                          num_steps, left_over_time, lim_dt);
+
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
             Online::RequestManager::get()->update(frame_duration);
             PROFILER_POP_CPU_MARKER();
 
+            if (World::getWorld())
+                Log::info("mainloop1", "At %d %f",
+                          World::getWorld()->getTicksSinceStart(),
+                          StkTime::getRealTime());
             m_ticks_adjustment.lock();
             if (m_ticks_adjustment.getData() != 0)
             {
@@ -448,7 +485,12 @@ void MainLoop::run()
                 }
             }
             m_ticks_adjustment.unlock();
-    
+
+            if (World::getWorld())
+                Log::info("mainloop2", "At %d %f",
+                          World::getWorld()->getTicksSinceStart(),
+                          StkTime::getRealTime());
+
             for (int i = 0; i < num_steps; i++)
             {
                 if (World::getWorld() && history->replayHistory())
@@ -459,19 +501,31 @@ void MainLoop::run()
     
                 PROFILER_PUSH_CPU_MARKER("Protocol manager update",
                                          0x7F, 0x00, 0x7F);
+                if (World::getWorld())
+                    Log::info("mainloop80", "At %d %f",
+                              World::getWorld()->getTicksSinceStart(),
+                              StkTime::getRealTime());
                 if (auto pm = ProtocolManager::lock())
                 {
                     pm->update(1);
                 }
                 PROFILER_POP_CPU_MARKER();
     
+                if (World::getWorld())
+                    Log::info("mainloop81", "At %d %f",
+                              World::getWorld()->getTicksSinceStart(),
+                              StkTime::getRealTime());
                 PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
                 if (World::getWorld())
                 {
                     updateRace(1);
                 }
                 PROFILER_POP_CPU_MARKER();
-    
+                if (World::getWorld())
+                    Log::info("mainloop82", "At %d %f",
+                              World::getWorld()->getTicksSinceStart(),
+                              StkTime::getRealTime());
+
                 // We need to check again because update_race may have requested
                 // the main loop to abort; and it's not a good idea to continue
                 // since the GUI engine is no more to be called then.
@@ -496,6 +550,10 @@ void MainLoop::run()
                 }
             }   // for i < num_steps
 
+            if (World::getWorld())
+                Log::info("mainloop3", "At %d %f",
+                          World::getWorld()->getTicksSinceStart(),
+                          StkTime::getRealTime());
             // Handle controller the last to avoid slow PC sending actions too 
             // late
             if (!ProfileWorld::isNoGraphics())
@@ -511,8 +569,15 @@ void MainLoop::run()
             
             if (auto gp = GameProtocol::lock())
             {
+                Log::verbose("gameprotocol", "At %d got lock",
+                             World::getWorld()->getTicksSinceStart());
                 gp->sendActions();
             }
+            if (World::getWorld())
+                Log::info("mainloop4", "At %d %f",
+                          World::getWorld()->getTicksSinceStart(),
+                          StkTime::getRealTime());
+
         }
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();

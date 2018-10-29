@@ -149,6 +149,9 @@ void Physics::removeKart(const AbstractKart *kart)
 /** Updates the physics simulation and handles all collisions.
  *  \param ticks Number of physics steps to simulate.
  */
+double xx[20] = { 0.0f };
+#include "LinearMath/btQuickprof.h"
+
 void Physics::update(int ticks)
 {
     PROFILER_PUSH_CPU_MARKER("Physics", 0, 0, 0);
@@ -166,15 +169,28 @@ void Physics::update(int ticks)
     // fixed frequency necessary for the physics update, we need to do exactly
     // one physic step only.
     double start;
-    if(UserConfigParams::m_physics_debug) start = StkTime::getRealTime();
+    start = StkTime::getRealTime();
+
+    HANDLE handle = GetCurrentThread();
 
     m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
-                                     stk_config->ticks2Time(1)      );
-    if (UserConfigParams::m_physics_debug)
+                                     stk_config->ticks2Time(1));
+
+    start = StkTime::getRealTime() - start;
+    if (1)
     {
-        Log::verbose("Physics", "At %d physics duration %12.8f",
+        Log::verbose("Physics", "At %d physics duration %12.8f xx0 %f xx1 %f pairs %d coll %f xx4: %f xx5: %f xx6: %f xx7: %f xx8: %f",
                      World::getWorld()->getTicksSinceStart(),
-                     StkTime::getRealTime() - start);
+                     start,   // duration
+                     xx[0],   // s1
+                     xx[1],   // s2
+                     int(xx[2]),   // pairs
+                     xx[3],   // coll
+                     xx[4],   // [4]
+                     xx[5],   // [5]
+                     xx[6],   // [6]
+                     xx[7]
+                     );
     }
 
     // Now handle the actual collision. Note: flyables can not be removed

@@ -48,6 +48,9 @@ subject to the following restrictions:
 
 #include "LinearMath/btSerializer.h"
 
+
+#include "LinearMath/btQuickprof.h"
+
 #if 0
 btAlignedObjectArray<btVector3> debugContacts;
 btAlignedObjectArray<btVector3> debugNormals;
@@ -233,6 +236,8 @@ void	btDiscreteDynamicsWorld::synchronizeMotionStates()
 	}
 }
 
+extern double xx[20];
+#include "../../../src/utils/time.hpp"
 
 int	btDiscreteDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, btScalar fixedTimeStep)
 {
@@ -273,23 +278,30 @@ int	btDiscreteDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, 
 		btIDebugDraw* debugDrawer = getDebugDrawer ();
 		gDisableDeactivation = (debugDrawer->getDebugMode() & btIDebugDraw::DBG_NoDeactivation) != 0;
 	}
-	if (numSimulationSubSteps)
+    static btClock clock = btClock();
+
+    if (numSimulationSubSteps)
 	{
+        double s0 = StkTime::getRealTime();
 
 		//clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
 		int clampedSimulationSteps = (numSimulationSubSteps > maxSubSteps)? maxSubSteps : numSimulationSubSteps;
 
 		saveKinematicState(fixedTimeStep*clampedSimulationSteps);
 
+        double s05 = StkTime::getRealTime();
+        xx[7] = s05-s0;
 		applyGravity();
-
-		
+        double s1 = StkTime::getRealTime();
+        xx[0] = (s1-s05);		
 
 		for (int i=0;i<clampedSimulationSteps;i++)
 		{
 			internalSingleStepSimulation(fixedTimeStep);
 			synchronizeMotionStates();
 		}
+        double s2 = StkTime::getRealTime();
+        xx[1] = (s2-s1);
 
 	} else
 	{
@@ -330,8 +342,10 @@ void	btDiscreteDynamicsWorld::internalSingleStepSimulation(btScalar timeStep)
 	dispatchInfo.m_debugDraw = getDebugDrawer();
 
 
+    xx[3] = StkTime::getRealTime();
 	///perform collision detection
 	performDiscreteCollisionDetection();
+    xx[3] = StkTime::getRealTime()-xx[3];
 
 
 	calculateSimulationIslands();

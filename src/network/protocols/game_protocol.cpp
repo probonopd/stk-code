@@ -142,6 +142,15 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
 void GameProtocol::controllerAction(int kart_id, PlayerAction action,
                                     int value, int val_l, int val_r)
 {
+    //static int xyz=0;
+    //xyz++;
+    //if(xyz<10) return;
+    //if (xyz>=10) xyz=0;
+    Log::info("gameprotocol", "at %d %lf sending %d action %d",
+              World::getWorld()->getTicksSinceStart(), 
+              StkTime::getRealTime(),
+              kart_id, (int)action);
+
     // Store the action in the list of actions that will be sent to the
     // server next.
     assert(NetworkConfig::get()->isClient());
@@ -179,6 +188,13 @@ void GameProtocol::handleControllerAction(Event *event)
     //int rewind_delta = 0;
     int cur_ticks = 0;
     const int not_rewound = RewindManager::get()->getNotRewoundWorldTicks();
+    Log::info("gameprotocol", "at %d %lf received from %d count %d",
+              World::getWorld()->getTicksSinceStart(),
+              StkTime::getRealTime(),
+              event->getPeer()->getHostId(),
+              count);
+
+
     for (unsigned int i = 0; i < count; i++)
     {
         cur_ticks = data.getUInt32();

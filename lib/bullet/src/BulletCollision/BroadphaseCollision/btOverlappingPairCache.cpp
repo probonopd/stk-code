@@ -373,12 +373,12 @@ void* btHashedOverlappingPairCache::removeOverlappingPair(btBroadphaseProxy* pro
 	return userData;
 }
 //#include <stdio.h>
-
+extern double xx[20];
 void	btHashedOverlappingPairCache::processAllOverlappingPairs(btOverlapCallback* callback,btDispatcher* dispatcher)
 {
 
 	int i;
-
+    xx[2] = m_overlappingPairArray.size();
 //	printf("m_overlappingPairArray.size()=%d\n",m_overlappingPairArray.size());
 	for (i=0;i<m_overlappingPairArray.size();)
 	{
