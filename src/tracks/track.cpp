@@ -56,6 +56,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "main_loop.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/profile_world.hpp"
@@ -1223,6 +1224,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // m_all_cached_meshes.
     m_all_cached_meshes.push_back(tangent_mesh);
     irr_driver->grabAllTextures(tangent_mesh);
+    main_loop->renderGUI();
 
 #ifdef DEBUG
     std::string debug_name=model_name+" (main track, octtree)";
@@ -1257,6 +1259,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
+            main_loop->renderGUI();
+
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
@@ -1264,9 +1268,12 @@ bool Track::loadMainTrack(const XMLNode &root)
             }
         }
     }
+    main_loop->renderGUI();
 
     for (unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
+        main_loop->renderGUI();
+
         const XMLNode *n=track_node->getNode(i);
         // Animated textures have already been handled
         if(n->getName()=="animated-texture") continue;
@@ -1438,7 +1445,9 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         convertTrackToBullet(m_all_nodes[i]);
         uploadNodeVertexBuffer(m_all_nodes[i]);
+        main_loop->renderGUI();
     }
+
     // Free the tangent (track mesh) after converting to physics
     if (ProfileWorld::isNoGraphics())
         tangent_mesh->freeMeshVertexBuffer();
@@ -1451,6 +1460,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_gfx_effect_mesh->createCollisionShape();
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
     scene_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
+    main_loop->renderGUI();
 
     return true;
 }   // loadMainTrack
@@ -1745,6 +1755,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         reverse_track = false;
     }
+    main_loop->renderGUI();
     CheckManager::create();
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
@@ -1784,12 +1795,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root, unique_id);
     file_manager->pushModelSearchPath(m_root);
+    main_loop->renderGUI();
+
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         SP::SPShaderManager::get()->loadSPShaders(m_root);
     }
 #endif
+    main_loop->renderGUI();
 
     // First read the temporary materials.xml file if it exists
     try
@@ -1809,6 +1823,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         // no temporary materials.xml file, ignore
         (void)e;
     }
+    main_loop->renderGUI();
 
     // Start building the scene graph
     // Soccer field with navmesh requires it
@@ -1899,6 +1914,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                                    sidewards_distance,
                                                    upwards_distance);
     }
+    main_loop->renderGUI();
 
     // we need to check for fog before loading the main track model
     if (const XMLNode *node = root->getNode("sun"))
@@ -1915,6 +1931,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         node->get("fog-start-height", &m_fog_height_start);
         node->get("fog-end-height",   &m_fog_height_end);
     }
+    main_loop->renderGUI();
 
 #ifndef SERVER_ONLY
     if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() && m_use_fog)
@@ -1941,6 +1958,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         SP::resetEmptyFogColor();
     }
 #endif
+    main_loop->renderGUI();
 
     if (const XMLNode *node = root->getNode("lightshaft"))
     {
@@ -1951,10 +1969,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadMainTrack(*root);
+    main_loop->renderGUI();
 
     unsigned int main_track_count = (unsigned int)m_all_nodes.size();
 
     ModelDefinitionLoader model_def_loader(this);
+    main_loop->renderGUI();
 
     // Load LOD groups
     const XMLNode *lod_xml_node = root->getNode("lod");
@@ -1962,6 +1982,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
+            main_loop->renderGUI();
+
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
@@ -1971,6 +1993,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadObjects(root, path, model_def_loader, true, NULL, NULL);
+    main_loop->renderGUI();
 
     // Correct the parenting of meta library
     for (auto& p : m_meta_library)
@@ -1983,14 +2006,19 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         meta_ln->getNode()->setParent(ln->getNode());
         recursiveUpdatePosition(meta_ln->getNode());
         recursiveUpdatePhysics(p.second->getChildren());
+        main_loop->renderGUI();
+
     }
 
     model_def_loader.cleanLibraryNodesAfterLoad();
+    main_loop->renderGUI();
 
     Scripting::ScriptEngine::getInstance()->compileLoadedScripts();
+    main_loop->renderGUI();
 
     // Init all track objects
     m_track_object_manager->init();
+    main_loop->renderGUI();
 
 
     // ---- Fog
@@ -2047,6 +2075,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         irr_driver->setClearbackBufferColor(m_sky_color);
     }
 #endif
+    main_loop->renderGUI();
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
@@ -2086,8 +2115,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         m_sun->grab();
     }
 #endif
+    main_loop->renderGUI();
 
     createPhysicsModel(main_track_count);
+    main_loop->renderGUI();
+
     freeCachedMeshVertexBuffer();
 
     const bool arena_random_item_created =
@@ -2107,6 +2139,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             }
         }   // for i<root->getNumNodes()
     }
+    main_loop->renderGUI();
+
     if (m_is_ctf &&
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
@@ -2121,6 +2155,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }   // for i<root->getNumNodes()
     }
     delete root;
+    main_loop->renderGUI();
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient())
@@ -2128,6 +2163,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         static_cast<NetworkItemManager*>(NetworkItemManager::get())
             ->initClientConfirmState();
     }
+    main_loop->renderGUI();
 
     if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
         Graph::get()->createDebugMesh();
@@ -2156,6 +2192,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         DriveGraph::get()->computeChecklineRequirements();
     }
+    main_loop->renderGUI();
 
     EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
     if(easter_world)
@@ -2163,6 +2200,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         std::string dir = StringUtils::getPath(m_filename);
         easter_world->readData(dir+"/easter_eggs.xml");
     }
+    main_loop->renderGUI();
 
     STKTexManager::getInstance()->unsetTextureErrorMessage();
 #ifndef SERVER_ONLY
@@ -2184,7 +2222,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 //-----------------------------------------------------------------------------
 
-void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
+void Track::loadObjects(const XMLNode* root, const std::string& path,
+                        ModelDefinitionLoader& model_def_loader,
                         bool create_lod_definitions, scene::ISceneNode* parent,
                         TrackObject* parent_library)
 {

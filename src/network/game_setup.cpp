@@ -180,7 +180,7 @@ void GameSetup::loadWorld()
     {
         race_manager->setReverseTrack(m_reverse);
         race_manager->startSingleRace(m_tracks.back(), m_laps,
-            false/*from_overworld*/);
+                                      false/*from_overworld*/);
     }
 }   // loadWorld
 
