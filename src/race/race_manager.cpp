@@ -57,7 +57,6 @@
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/online/vote_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
@@ -478,10 +477,6 @@ void RaceManager::startNextRace()
     // sfx_manager->dump();
 
     IrrlichtDevice* device = irr_driver->getDevice();
-    //GUIEngine::renderLoading();
-    //device->getVideoDriver()->endScene();
-    //device->getVideoDriver()->beginScene(true, true,
-    //                                     video::SColor(255,100,101,140));
 
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -964,15 +959,6 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 {
     assert(!m_watching_replay);
     StateManager::get()->enterGameState();
-
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient()        )
-    {
-        VoteOverview *overview = VoteOverview::getInstance();
-        if (GUIEngine::getCurrentScreen() != overview)
-            overview->push();
-    }
-
 
     setTrack(track_ident);
 
