@@ -7,20 +7,20 @@ sudo: false
 language: cpp
 os:
   - linux
-  # osx
+  - osx
 compiler:
   - gcc
-  # clang
+  - clang
 
 matrix:
   fast_finish: true
 
 env:
   matrix:
-    # BUILD_TYPE="Debug" SERVER_ONLY="OFF"
-    # BUILD_TYPE="Debug" SERVER_ONLY="ON"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
     - BUILD_TYPE="Release" SERVER_ONLY="OFF"
-    # BUILD_TYPE="Release" SERVER_ONLY="ON"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON"
 
 addons:
   apt:
