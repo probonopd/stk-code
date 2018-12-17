@@ -7,20 +7,20 @@ sudo: false
 language: cpp
 os:
   - linux
-  - osx
+  # osx
 compiler:
   - gcc
-  - clang
+  # clang
 
 matrix:
   fast_finish: true
 
 env:
   matrix:
-    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
+    # BUILD_TYPE="Debug" SERVER_ONLY="OFF"
+    # BUILD_TYPE="Debug" SERVER_ONLY="ON"
     - BUILD_TYPE="Release" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Release" SERVER_ONLY="ON"
+    # BUILD_TYPE="Release" SERVER_ONLY="ON"
 
 addons:
   apt:
@@ -61,6 +61,9 @@ script:
       chmod a+x linuxdeployqt-continuous-x86_64.AppImage
       unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
       export VERSION=$(git rev-parse --short HEAD) # linuxdeployqt uses this for naming the file
+      wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64" -O appdir/AppRun && chmod +x appdir/AppRun
+      ( cd appdir/ ; ln -s usr/share/supertuxkart/data . )
+      svn co https://svn.code.sf.net/p/supertuxkart/code/stk-assets ./appdir/usr/share/supertuxkart/data/
       ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
       find appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
       # curl --upload-file SuperTuxKart*.AppImage https://transfer.sh/SuperTuxKart-git.$(git rev-parse --short HEAD)-x86_64.AppImage
