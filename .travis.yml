@@ -7,20 +7,20 @@ sudo: false
 language: cpp
 os:
   - linux
-  # osx
+  - osx
 compiler:
   - gcc
-  # clang
+  - clang
 
 matrix:
   fast_finish: true
 
 env:
   matrix:
-    # BUILD_TYPE="Debug" SERVER_ONLY="OFF"
-    # BUILD_TYPE="Debug" SERVER_ONLY="ON"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
     - BUILD_TYPE="Release" SERVER_ONLY="OFF"
-    # BUILD_TYPE="Release" SERVER_ONLY="ON"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON"
 
 addons:
   apt:
@@ -55,7 +55,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
   - make VERBOSE=1 -j3
   - |
-    if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
+    if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$CC" == "gcc" ] && [ "$BUILD_TYPE" == "Release" ] && [ "$SERVER_ONLY" == "OFF" ] ; then
       make DESTDIR=appdir -j$(nproc) install ; find appdir/
       wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
       chmod a+x linuxdeployqt-continuous-x86_64.AppImage
